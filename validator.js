@@ -1198,8 +1198,18 @@ function trim(str, chars) {
 }
 
 function escape(str) {
+  var ignores = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
   assertString(str);
-  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/\\/g, '&#x5C;').replace(/`/g, '&#96;');
+  var lists = [{ symbol: '\&', value: '&amp;' }, { symbol: '\"', value: '&quot;' }, { symbol: '\'', value: '&#x27;' }, { symbol: '\<', value: '&lt;' }, { symbol: '\>', value: '&gt;' }, { symbol: '\\\\', value: '&#x5C;' }, { symbol: '\/', value: '&#x2F;' }, { symbol: '\`', value: '&#96;' }];
+
+  return lists.filter(function (x) {
+    return ignores.indexOf(x.symbol) === -1;
+  }).reduce(function (prev, _ref) {
+    var symbol = _ref.symbol,
+        value = _ref.value;
+    return prev.replace(new RegExp(symbol, 'g'), value);
+  }, str);
 }
 
 function unescape(str) {

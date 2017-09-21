@@ -1,13 +1,19 @@
 import assertString from './util/assertString';
 
-export default function escape(str) {
+export default function escape(str, ignores = []) {
   assertString(str);
-  return (str.replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\//g, '&#x2F;')
-    .replace(/\\/g, '&#x5C;')
-    .replace(/`/g, '&#96;'));
+  const lists = [
+    { symbol: '\&', value: '&amp;' },
+    { symbol: '\"', value: '&quot;' },
+    { symbol: '\'', value: '&#x27;' },
+    { symbol: '\<', value: '&lt;' },
+    { symbol: '\>', value: '&gt;' },
+    { symbol: '\\\\', value: '&#x5C;' },
+    { symbol: '\/', value: '&#x2F;' },
+    { symbol: '\`', value: '&#96;' },
+  ];
+
+  return lists
+    .filter(x => ignores.indexOf(x.symbol) === -1)
+    .reduce((prev, { symbol, value }) => prev.replace(new RegExp(symbol, 'g'), value), str);
 }
